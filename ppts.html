@@ -1,0 +1,284 @@
+<!--
+    Powered By nodeppt - This is probably the best web presentation tool so far!
+    version: 1.4.5
+    site: https://github.com/ksky521/nodeppt
+    date: 
+-->
+<!doctype html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>面向未来的API-GraphQL - By 张桂</title>
+    <link rel="stylesheet" media="all" href="./css/nodeppt.css">
+    <link rel="stylesheet" media="only screen and (max-device-width: 480px)" href="./css/phone.css">
+    
+    <link rel="stylesheet" href="./js/highlight/styles/monokai_sublime.css">
+    <link rel="stylesheet" href="./css/font-awesome.css">
+    
+<link rel="stylesheet" href="./css/theme.dark.css">
+</head>
+<body>
+<div class="slides">
+    <slides id="container">
+        <slide class="slide"><section class="slide-wrapper"><article class="flexbox vcenter">
+<h1>GraphQL</h1>
+<h2>面向未来的API查询语言</h2>
+<p><small>分享人：张桂</small></p>
+
+</article></section></slide>
+<slide class="slide"><section class="slide-wrapper"><hgroup>
+<h2>理解传统的RESTful架构</h2>
+
+</hgroup><article>
+
+<ul class="fadeIn">
+<li>REST是做什么的？<ul>
+<li>REST是一种规范，是所有Web应用都应该遵守的架构设计指导原则，前后端通信的桥梁。想要对服务端的资源进行操作，就必须通过统一的接口来执行，对资源CURD以后返回资源最新的状态。</li>
+</ul>
+</li>
+<li>REST是怎么做的？<ul>
+<li>用户通过前端的操作，去发出一个带有HTTP动词(GET用来获取资源、POST用来新建资源（也可以用于更新资源）、PUT用来更新资源、DELETE用来删除资源)的请求，这个请求会有一个特定的URI，而这个URI对应了服务器端一个特定的资源或者对特定资源的一系列操作。待服务器端完成这一个请求所导致的状态转化后，返回给前端，来达到用户操作的目的。</li>
+</ul>
+</li>
+</ul>
+
+</article></section></slide>
+<slide class="slide"><section class="slide-wrapper"><hgroup>
+<h2>一个RESTful API是什么样的？</h2>
+<h3>假定通过用户的 username 去获取用户的信息</h3>
+
+</hgroup><article>
+
+<div class="columns-2">
+    <pre><pre>发出请求示例</pre>    <pre>API-URL: /restFul/userInfo</pre><pre>type: GET</pre><pre>parmas: {"username": "gui.zhang"}</pre></pre>
+    <pre><pre>请求返回示例</pre><code class="json">{
+        "name": "gui.zhang",
+        "sex" : "male",
+        "nickname" : "loveWhoWho",
+        "desc" : "a man",
+        "age" : "18"
+}
+    </code></pre>
+</div>
+</article></section></slide>
+<slide class="slide"><section class="slide-wrapper"><hgroup>
+<h2>RESTful的几个特点（问题）</h2>
+
+</hgroup><article>
+
+<ul class="fadeIn">
+<li>客户端发出请求的时候要带着一个HTTP动词</li>
+<li>一个接口只能有一种功能</li>
+<li>一个接口对应了一个特定的服务器资源</li>
+<li>需要你自己来构建整个请求与响应</li>
+<li>客户端能得到的响应结果由服务端决定</li>
+<li>每一次请求都会去建立一次http连接</li>
+</ul>
+
+</article></section></slide>
+<slide class="slide"><section class="slide-wrapper"><article>
+<h2>so！摄像机准备，主角是时候要登场了（手动bgm）</h2>
+
+</article></section></slide>
+<slide class="slide"><section class="slide-wrapper"><article>
+<h2>主角就是说是要改变历史但还没有大量人用的GraphQL</h2>
+
+</article></section></slide>
+<slide class="slide"><section class="slide-wrapper"><article>
+<h2>我们来认识一下这个神奇的东西</h2>
+
+</article></section></slide>
+<slide class="slide"><section class="slide-wrapper"><hgroup>
+<h2>什么是GraphQL？</h2>
+
+</hgroup><article>
+
+<ul class="fadeIn">
+<li>GraphQL（Graph Query Language）是facebook发行的一种用于 API 的查询语言。 GraphQL 对你的 API 中的数据提供了一套易于理解的完整描述，使得客户端能够准确地获得它需要的数据，而且没有任何冗余，也就是说GraphQL 可以通过一个 API 去获取不同的几个或者更多的资源。 </li>
+</ul>
+
+</article></section></slide>
+<slide class="slide"><section class="slide-wrapper"><hgroup>
+<h2>我们来看个简单的栗子</h2>
+<h3>根据 username 获取用户的信息，只想要他的年龄和性别字段</h3>
+
+</hgroup><article>
+
+<div class="columns-2">
+    <pre><pre>发出请求示例</pre>    <pre>API-URL: /graphql/userInfo</pre><pre>query: </pre><code class="json">{
+    user(username: "gui,zhang"){
+        age,
+        sex,
+    }
+}</code></pre>
+    <pre><pre>请求返回示例</pre><code class="json">{
+    "data": {
+        "user":{
+            "age" : "18",
+            "sex" : "male"
+        }
+    }
+}
+    </code></pre>
+</div>
+</article></section></slide>
+<slide class="slide"><section class="slide-wrapper"><article class="flexbox vleft">
+<h1>设定一个业务场景</h1>
+<blockquote>
+<p>获取数据库里的全量的用户数据，或者根据特定条件去查询用户信息，看看REST和GraphQL分别是怎么做的</p>
+</blockquote>
+
+</article></section></slide>
+<slide class="slide"><section class="slide-wrapper"><article class="flexbox vleft">
+<h1>看一个完整GraphQL的栗子</h1>
+<blockquote>
+<p>express搭建服务，MongoDB用作数据库，为了简化学习示例使用本地数据 <a href="https://github.com/Mcalready/GraphQL_Express_Demo" target="_blank">https://github.com/Mcalready/GraphQL_Express_Demo</a></p>
+</blockquote>
+
+</article></section></slide>
+<slide class="slide"><section class="slide-wrapper"><hgroup>
+<h2>总结一下几个特点（主角光环）</h2>
+
+</hgroup><article>
+
+<ul>
+<li>数据强类型</li>
+<li>最大的特点就是前端想要什么样的结构和数据都可以 {:&amp;.fadeIn}</li>
+<li>一个嵌套的概念(写API的话需要学习)</li>
+<li>一个url可以做很多事，增删改查一个接口就可以搞定</li>
+<li>加不加HTTP动词都无所谓，因为数据的增删改查都是由Graph来决定</li>
+<li>一个GraphQL的请求可以唤起多个解析器（Resolver）在一次响应中访问多种资源</li>
+<li>避免响应数据的冗余</li>
+<li>避免多次建立HTTP连接，对前端，尤其是webapp的性能有很大提升</li>
+<li>前端更自由，后端更严谨</li>
+</ul>
+
+</article></section></slide>
+<slide class="slide"><section class="slide-wrapper"><article class="flexbox vleft">
+<h1>再看一个上面业务场景用RESTful实现的栗子</h1>
+<blockquote>
+<p>express搭建服务，MongoDB用作数据库 <a href="https://github.com/Mcalready/RestFul_Express_Demo" target="_blank">https://github.com/Mcalready/RestFul_Express_Demo</a></p>
+</blockquote>
+
+</article></section></slide>
+<slide class="slide"><section class="slide-wrapper"><hgroup>
+<h2>对比一下两者</h2>
+
+</hgroup><article>
+
+<ul>
+<li>REST一个接口对应一个资源，或者说一个功能。GraphQL一个接口可对应很多资源，或者很多功能。</li>
+<li>REST一个灵活性不高，接口数据结构已经定义好。GraphQL可以自由获取你所需要的字段，不多不少。</li>
+<li>REST没有嵌套的概念，比较单纯。GraphQL数据结构复杂，盘根错节。</li>
+<li>REST的请求需要带有HTTP动词。GraphQL对于这个没有要求，数据的增删改查都在内部完成。</li>
+<li>REST的不可以修改返参的字段名。GraphQL随便改。</li>
+<li>REST对于后端来说更得心应手，GraphQL对于前端来说更自由，但是后端写API要更严谨</li>
+</ul>
+
+</article></section></slide>
+<slide class="slide"><section class="slide-wrapper"><hgroup>
+<h2>一些资料</h2>
+
+</hgroup><article>
+
+<ul>
+<li>中文文档 <a href="https://graphql.cn/" target="_blank">https://graphql.cn/</a></li>
+<li>写graphQL的两种方法 <a href="https://github.com/Mcalready/GraphQl_Two_Type" target="_blank">https://github.com/Mcalready/GraphQl_Two_Type</a></li>
+<li>一套完整的服务框架 Apollo-client:<a href="https://www.apollographql.com/client/" target="_blank">https://www.apollographql.com/client/</a></li>
+<li>StackOverflow的graphql专区 <a href="https://stackoverflow.com/questions/tagged/graphql" target="_blank">https://stackoverflow.com/questions/tagged/graphql</a></li>
+<li>nodejs+mongoDB+GraphQL(or REST) <a href="https://www.youtube.com/watch?v=PHabPhgRUuU" target="_blank">https://www.youtube.com/watch?v=PHabPhgRUuU</a></li>
+<li>学习apollo <a href="https://www.learnapollo.com/" target="_blank">https://www.learnapollo.com/</a></li>
+<li>学习relay <a href="https://www.learnrelay.org/" target="_blank">https://www.learnrelay.org/</a></li>
+</ul>
+
+</article></section></slide>
+<slide class="slide"><section class="slide-wrapper"><article>
+<h2>Thanks！</h2>
+
+</article></section></slide>
+        
+
+        <!-- <slide class="slide logoslide dark nobackground">
+            <article class="flexbox vcenter">
+                <h2 style="color: white;">Powered By nodeppt v1.4.5</h2>
+            </article>
+        </slide> -->
+        <div class="slideTip" id="tip"></div>
+    </slides>
+</div>
+<canvas id="drawBoard" class="draw-board" width="900" height="700"></canvas>
+<div class="progress"><span id="progress"></span></div>
+<div id="_buttons">
+    <div class="_btn-box" id="_btn-box" style="display:none;">
+        <button class="fa fa-arrow-circle-left" id="_btn-prev"></button>
+        <button class="fa fa-arrow-circle-right" id="_btn-next"></button>
+        <button class="fa fa-paint-brush" id="_btn-brush"></button>
+        <button class="fa fa-compress" id="_btn-overview" data-toggle="fa fa-expand"></button>
+    </div>
+    <button class="fa fa-bars" id="_btn-bar"  data-toggle="fa fa-close"></button>
+</div>
+<script src="./js/mixjs/lib/mix.0.3.0.min.js"></script>
+<script>
+    var ASSET_RELATIVE_DIR = ".";
+</script>
+<script>
+var base = location.protocol + '//' + location.host;
+
+var path = (location.pathname + '#').split('/').filter(function(v){
+    return !!v;
+});
+path.pop();
+path = path.join('/');
+if (typeof ASSET_RELATIVE_DIR === 'string') {
+    path = path + '/' + ASSET_RELATIVE_DIR;
+}
+MixJS.config({
+    baseURL: [ base, path, 'js'].join('/')+'/'
+});
+
+</script>
+<script src="./js/mixjs/lib/event/broadcast.js"></script>
+<script src="./js/nodeppt.js"></script>
+<script>
+Slide.init({
+    containerID: 'container',
+    drawBoardID: 'drawBoard',
+    slideClass: '.slide',
+    buildClass: '.build',
+    progressID: 'progress',
+    transition: 'zoomin',
+    width: 1100,
+    dir: './',
+    
+    //打开下面的注释就开启postMessage方式
+    //访问网址127.0.0.1:8080/ppt/demo#client
+    control:{
+        type: 'postMessage',
+        args:{
+            isControl:  false
+        }
+    },
+    
+    tipID: 'tip'
+});
+MixJS.loadJS('highlight/highlight.pack.js',function(){
+    hljs.tabReplace = '  ';
+    hljs.initHighlightingOnLoad();
+});
+</script>
+<script src="./js/demo.js"></script>
+<link rel="stylesheet" href="./css/demo.css">
+<script src="./js/zoom.js"></script>
+
+<!-- MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+  config: ["TeX-AMS-MML_HTMLorMML.js"],
+  tex2jax: {inlineMath: [['\\(','\\)']]}});
+  //['$','$'], 避免货币价格冲突
+</script>
+<script type="text/javascript" src="./js/mathjax/MathJax.js"></script>
+
+<!--placeholder-->
+</body>
+</html>
